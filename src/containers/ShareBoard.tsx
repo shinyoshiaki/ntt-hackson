@@ -31,7 +31,7 @@ const ShareBoard: FunctionComponent<{ isTeacher: boolean; room: string }> = ({
           if (raw.label === "share") setText(raw.data);
         });
         setPeer(peer);
-      }, 1000);
+      }, 3000);
     }
   };
   console.log({ peer });
