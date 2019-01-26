@@ -37,7 +37,13 @@ const ShareBoard: FunctionComponent<{ isTeacher: boolean; room: string }> = ({
   console.log({ peer });
   return (
     <div
-      style={{ margin: 20, marginTop: 0, padding: 20, border: "solid thin" }}
+      style={{
+        margin: 20,
+        marginTop: 0,
+        height: "auto",
+        padding: 20,
+        border: "solid thin"
+      }}
     >
       <p>shareboard</p>
       {peer && (
