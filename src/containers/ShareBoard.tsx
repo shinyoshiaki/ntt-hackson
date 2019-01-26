@@ -50,7 +50,6 @@ const ShareBoard: FunctionComponent<{ isTeacher: boolean; room: string }> = ({
         <div style={{ width: "40vw" }}>
           <TextField
             multiline
-            rows="8"
             value={text}
             onChange={e => {
               setText(e.target.value);
