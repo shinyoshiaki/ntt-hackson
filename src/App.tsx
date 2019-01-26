@@ -9,30 +9,77 @@ import Teacher from "./pages/teacher";
 import Student from "./pages/student";
 
 const App: FunctionComponent = () => {
-  const [videoStream, setVideo] = useState<any>(undefined);
-  const [desktopStream, setDesktop] = useState<any>(undefined);
+  const [room, setRoom] = useState("");
+  const [user, setUser] = useState("def");
+  let targetDesktopRef: any = React.createRef();
+  let myDesktopRef: any = React.createRef();
+  let targetVideoRef: any = React.createRef();
+  let myVideoRef: any = React.createRef();
 
   useEffect(() => {
     init();
   }, []);
 
   async function init() {
-    const videoStream = await getLocalVideo();
-    setVideo(videoStream);
-    const desktopStream = await getLocalDesktop();
-    setDesktop(desktopStream);
+    myDesktopRef.srcObject = await getLocalDesktop();
+    myVideoRef.srcObject = await getLocalVideo();
   }
 
   return (
     <div>
-      <TabMol
-        tabs={{
-          teacher: () => <Teacher videoStream={videoStream} />,
-          student: () => (
-            <Student videoStream={videoStream} desktopStream={desktopStream} />
-          )
-        }}
-      />
+      <div>
+        <TextField
+          value={room}
+          onChange={e => {
+            setRoom(e.target.value);
+          }}
+        />
+        <Button
+          onClick={() => {
+            const call = peer.joinRoom(room, {
+              mode: "sfu",
+              stream: myDesktopRef.srcObject
+            });
+            if (!call) return;
+            call.on("stream", stream => {
+              (targetDesktopRef as any).srcObject = stream;
+            });
+            const video = peer.joinRoom(room + "video", {
+              mode: "sfu",
+              stream: myVideoRef.srcObject
+            });
+            if (!video) return;
+            video.on("stream", stream => {
+              (targetVideoRef as any).srcObject = stream;
+            });
+          }}
+        >
+          open
+        </Button>
+      </div>
+
+      <div>
+        <video
+          ref={video => ((myVideoRef as any) = video)}
+          autoPlay={true}
+          style={{ width: "50%", height: "100%" }}
+        />
+        <video
+          ref={video => ((targetVideoRef as any) = video)}
+          autoPlay={true}
+          style={{ width: "50%", height: "100%" }}
+        />
+        <video
+          ref={video => ((myDesktopRef as any) = video)}
+          autoPlay={true}
+          style={{ width: "50%", height: "100%" }}
+        />
+        <video
+          ref={video => ((targetDesktopRef as any) = video)}
+          autoPlay={true}
+          style={{ width: "50%", height: "100%" }}
+        />
+      </div>
     </div>
   );
 };
