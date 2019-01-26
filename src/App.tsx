@@ -2,15 +2,12 @@ import React, { FunctionComponent, useEffect, useState } from "react";
 import { TextField, Button } from "@material-ui/core";
 import Peer from "skyway-js";
 import { getLocalVideo } from "webrtc4me/lib/utill";
-import useObject from "useobject";
 import { getLocalDesktop } from "./webrtc/utill";
-import TabMol from "./components/tab";
-import Teacher from "./pages/teacher";
-import Student from "./pages/student";
+
+let peer: Peer;
 
 const App: FunctionComponent = () => {
   const [room, setRoom] = useState("");
-  const [user, setUser] = useState("def");
   let targetDesktopRef: any = React.createRef();
   let myDesktopRef: any = React.createRef();
   let targetVideoRef: any = React.createRef();
@@ -36,6 +33,10 @@ const App: FunctionComponent = () => {
         />
         <Button
           onClick={() => {
+            peer = new Peer({
+              key: "725b7ef3-cd3d-4032-b019-00fc43b6639f",
+              debug: 3
+            });
             const call = peer.joinRoom(room, {
               mode: "sfu",
               stream: myDesktopRef.srcObject
