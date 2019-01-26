@@ -1,8 +1,9 @@
 import React, { FunctionComponent, useEffect } from "react";
-import {Input} from '@material-ui/core'
+import { TextField, Button } from "@material-ui/core";
 import Peer from "skyway-js";
 import { getLocalVideo } from "webrtc4me/lib/utill";
 import useObject from "useobject";
+import { getLocalDesktop } from "./webrtc/utill";
 let peer: Peer;
 let stream: MediaStream;
 
@@ -13,9 +14,7 @@ interface State {
 const App: FunctionComponent = () => {
   const { state, setState } = useObject<State>({});
   let videoRef = React.createRef();
-  const handleRef = (video: any) => {
-    videoRef = video;
-  };
+  let myVideoRef: any = React.createRef();
 
   useEffect(() => {
     peer = new Peer({ key: "725b7ef3-cd3d-4032-b019-00fc43b6639f", debug: 3 });
@@ -23,17 +22,18 @@ const App: FunctionComponent = () => {
   }, []);
 
   async function init() {
-    stream = await getLocalVideo();
+    stream = await getLocalDesktop();
+    myVideoRef.srcObject = stream;
   }
 
   return (
     <div>
-      <input
+      <TextField
         onChange={e => {
           setState({ room: e.target.value });
         }}
       />
-      <button
+      <Button
         onClick={() => {
           if (!state.room) return;
           const call = peer.joinRoom(state.room, { mode: "sfu", stream });
@@ -44,12 +44,19 @@ const App: FunctionComponent = () => {
         }}
       >
         open
-      </button>
-      <video
-        ref={handleRef}
-        autoPlay={true}
-        style={{ width: "100%", height: "100%" }}
-      />
+      </Button>
+      <div>
+        <video
+          ref={video => ((myVideoRef as any) = video)}
+          autoPlay={true}
+          style={{ width: "50%", height: "100%" }}
+        />
+        <video
+          ref={video => ((videoRef as any) = video)}
+          autoPlay={true}
+          style={{ width: "50%", height: "100%" }}
+        />
+      </div>
     </div>
   );
 };
