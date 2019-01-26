@@ -36,18 +36,21 @@ const ShareBoard: FunctionComponent<{ isTeacher: boolean; room: string }> = ({
   };
   console.log({ peer });
   return (
-    <div>
+    <div
+      style={{ margin: 20, marginTop: 0, padding: 20, border: "solid thin" }}
+    >
       <p>shareboard</p>
       {peer && (
-        <div>
+        <div style={{ width: "40vw" }}>
           <TextField
             multiline
-            rows="5"
+            rows="8"
             value={text}
             onChange={e => {
               setText(e.target.value);
               peer.send(e.target.value, "share");
             }}
+            style={{ width: "40vw" }}
           />
         </div>
       )}

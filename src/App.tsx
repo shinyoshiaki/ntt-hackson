@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
-import { TextField, Button } from "@material-ui/core";
+import { TextField, Button, Divider } from "@material-ui/core";
 import Peer from "skyway-js";
 import { getLocalVideo } from "webrtc4me/lib/utill";
 import useObject from "useobject";
@@ -78,41 +78,43 @@ const App: FunctionComponent = () => {
         >
           student
         </Button>
-        <p style={{ paddingRight: 30 }} />
-        <p style={{ paddingRight: 30 }}>{room}</p>
-        <p style={{ paddingRight: 30 }}>{user !== "def" && user}</p>
-        <p style={{ paddingRight: 30 }}>{connect !== "def" && connect}</p>
+        <p style={{ paddingRight: 30 }}>{""}</p>
+        <p style={{ paddingRight: 30 }}>room:{room}</p>
+        <p style={{ paddingRight: 30 }}>user:{user !== "def" && user}</p>
+        <p style={{ paddingRight: 30 }}>
+          status:{connect !== "def" && connect}
+        </p>
       </div>
 
-      <div>
+      <div style={{ display: "flex", flexDirection: "column" }}>
         <div style={{ display: "flex" }}>
           <video
             ref={video => ((myVideoRef as any) = video)}
             autoPlay={true}
-            style={{ height: "40vh" }}
+            style={{ width: "30vw", maxHeight: "40vh", paddingRight: 30 }}
           />
           <video
             ref={video => ((targetVideoRef as any) = video)}
             autoPlay={true}
-            style={{ height: "40vh" }}
+            style={{ width: "30vw", maxHeight: "40vh" }}
           />
         </div>
+        <br />
+        <Divider />
+        <br />
         <div style={{ display: "flex" }}>
           {user !== "teacher" && (
             <video
               ref={video => ((myDesktopRef as any) = video)}
               autoPlay={true}
-              style={{
-                height: user === "teacher" ? "0vh" : "40vh",
-                width: user === "teacher" ? "0vw" : "auto"
-              }}
+              style={{ width: "40vw", maxHeight: "50vh" }}
             />
           )}
           {user !== "student" && (
             <video
               ref={video => ((targetDesktopRef as any) = video)}
               autoPlay={true}
-              style={{ height: "40vh" }}
+              style={{ width: "40vw", maxHeight: "50vh" }}
             />
           )}
 
