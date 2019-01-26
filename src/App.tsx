@@ -69,12 +69,12 @@ const App: FunctionComponent = () => {
           style={{ width: "50%", height: "100%" }}
         />
         <video
-          ref={video => ((myDesktopRef as any) = video)}
+          ref={video => ((targetVideoRef as any) = video)}
           autoPlay={true}
           style={{ width: "50%", height: "100%" }}
         />
         <video
-          ref={video => ((targetVideoRef as any) = video)}
+          ref={video => ((myDesktopRef as any) = video)}
           autoPlay={true}
           style={{ width: "50%", height: "100%" }}
         />
