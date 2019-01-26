@@ -1,20 +1,30 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useEffect } from "react";
 import Peer from "skyway-js";
 import { TextField, Button } from "@material-ui/core";
+import useObject from "useobject";
+
+interface State {
+  room?: string;
+}
 
 let peerVideo: Peer;
 let peerDesktop: Peer;
 
+interface State {
+  start: boolean;
+  room?: string;
+}
+
 let targetVideoRef: any;
 let myVideoRef: any;
-let myDesktopRef: any;
-let targetDesktopRef: any;
-const Teacher: FunctionComponent<{
-  videoStream?: MediaStream;
+let desktopRef: any;
+
+const Student: FunctionComponent<{
   desktopStream?: MediaStream;
-}> = ({ videoStream, desktopStream }) => {
-  const [start, setStart] = useState(false);
-  const [room, setRoom] = useState("");
+  videoStream?: MediaStream;
+}> = ({ desktopStream, videoStream }) => {
+  const { state, setState } = useObject<State>({ start: false });
+
   useEffect(() => {
     peerVideo = new Peer({
       key: "725b7ef3-cd3d-4032-b019-00fc43b6639f",
@@ -26,46 +36,47 @@ const Teacher: FunctionComponent<{
     });
     targetVideoRef = React.createRef();
     myVideoRef = React.createRef();
-    myDesktopRef = React.createRef();
-    targetDesktopRef = React.createRef();
-    setStart(true);
+    desktopRef = React.createRef();
+    setState({ start: true });
     setTimeout(() => {
       init();
     }, 1000);
   }, []);
 
   async function init() {
+    desktopRef.srcObject = desktopStream;
     myVideoRef.srcObject = videoStream;
+    console.log({ targetVideoRef });
   }
 
   return (
     <div>
       <TextField
         onChange={e => {
-          setRoom(e.target.value);
+          setState({ room: e.target.value });
         }}
       />
       <Button
         onClick={() => {
-          if (!room) return;
-          const video = peerVideo.joinRoom(room + "video", {
+          if (!state.room) return;
+          // const video = peerVideo.joinRoom(state.room + "video", {
+          //   mode: "sfu",
+          //   stream: videoStream
+          // });
+          // if (!video) return;
+          // video.on("stream", stream => {
+          //   console.log({ targetVideoRef });
+          //   targetVideoRef.srcObject = stream;
+          // });
+          const desktop = peerDesktop.joinRoom(state.room + "desktop", {
             mode: "sfu",
-            stream: myVideoRef.srcObject
-          });
-          if (!video) return;
-          video.on("stream", stream => {
-            console.log({ targetVideoRef });
-            targetVideoRef.srcObject = stream;
-          });
-          const desktop = peerDesktop.joinRoom(room + "desktop", {
-            mode: "sfu",
-            stream: myDesktopRef.srcObject
+            stream: desktopStream
           });
           if (!desktop) return;
           desktop.on("stream", stream => {
-            targetDesktopRef.srcObject = stream;
+            desktopRef.srcObject = stream;
           });
-          setRoom("");
+          setState({ room: "" });
         }}
       >
         open
@@ -85,7 +96,7 @@ const Teacher: FunctionComponent<{
         />
       </div>
       <video
-        ref={video => ((targetDesktopRef as any) = video)}
+        ref={video => (desktopRef = video)}
         autoPlay={true}
         style={{ height: "40vh" }}
         key={"desktop"}
@@ -94,4 +105,4 @@ const Teacher: FunctionComponent<{
   );
 };
 
-export default Teacher;
+export default Student;
