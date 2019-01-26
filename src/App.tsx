@@ -11,7 +11,7 @@ let myDesktopRef: any = React.createRef();
 let targetVideoRef: any = React.createRef();
 let myVideoRef: any = React.createRef();
 
-const handleConnect = (room: string, connect: () => void) => {
+const connectServer = (room: string, connect: () => void) => {
   const call = peer.joinRoom(room, {
     mode: "sfu",
     stream: myDesktopRef.srcObject
@@ -34,7 +34,7 @@ const handleConnect = (room: string, connect: () => void) => {
 const App: FunctionComponent = () => {
   const [room, setRoom] = useState("");
   const [user, setUser] = useState("def");
-  const [connect, setConnect] = useState("def");
+  const [status, setStatus] = useState("def");
 
   useEffect(() => {
     peer = new Peer({ key: "725b7ef3-cd3d-4032-b019-00fc43b6639f", debug: 3 });
@@ -45,6 +45,15 @@ const App: FunctionComponent = () => {
     myDesktopRef.srcObject = await getLocalDesktop();
     myVideoRef.srcObject = await getLocalVideo();
   }
+
+  const handleConnect = (userType: string) => {
+    setStatus("connecting");
+    if (status === "def")
+      connectServer(room, () => {
+        setUser(userType);
+        setStatus("connected");
+      });
+  };
 
   return (
     <div>
@@ -57,22 +66,14 @@ const App: FunctionComponent = () => {
         />
         <Button
           onClick={() => {
-            setConnect("connecting");
-            handleConnect(room, () => {
-              setUser("teacher");
-              setConnect("connected");
-            });
+            handleConnect("teacher");
           }}
         >
           teacher
         </Button>
         <Button
           onClick={() => {
-            setConnect("connecting");
-            handleConnect(room, () => {
-              setUser("student");
-              setConnect("connected");
-            });
+            handleConnect("student");
           }}
         >
           student
@@ -80,7 +81,7 @@ const App: FunctionComponent = () => {
         <p style={{ paddingRight: 30 }}>{""}</p>
         <p style={{ paddingRight: 30 }}>room　:　{room}</p>
         <p style={{ paddingRight: 30 }}>
-          status　:　{connect !== "def" && connect}
+          status　:　{status !== "def" && status}
         </p>
         <p style={{ paddingRight: 30 }}>user　:　{user !== "def" && user}</p>
       </div>
