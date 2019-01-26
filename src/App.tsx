@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 import { TextField, Button } from "@material-ui/core";
 import Peer from "skyway-js";
 import { getLocalVideo } from "webrtc4me/lib/utill";
@@ -12,8 +12,11 @@ interface State {
 }
 
 const App: FunctionComponent = () => {
-  const { state, setState } = useObject<State>({});
-  let videoRef = React.createRef();
+  const [room, setRoom] = useState("");
+  const [user, setUser] = useState("def");
+  let targetDesktopRef: any = React.createRef();
+  let myDesktopRef: any = React.createRef();
+  let targetVideoRef: any = React.createRef();
   let myVideoRef: any = React.createRef();
 
   useEffect(() => {
@@ -22,29 +25,43 @@ const App: FunctionComponent = () => {
   }, []);
 
   async function init() {
-    stream = await getLocalDesktop();
-    myVideoRef.srcObject = stream;
+    myDesktopRef.srcObject = await getLocalDesktop();
+    myVideoRef.srcObject = await getLocalVideo();
   }
 
   return (
     <div>
-      <TextField
-        onChange={e => {
-          setState({ room: e.target.value });
-        }}
-      />
-      <Button
-        onClick={() => {
-          if (!state.room) return;
-          const call = peer.joinRoom(state.room, { mode: "sfu", stream });
-          if (!call) return;
-          call.on("stream", stream => {
-            (videoRef as any).srcObject = stream;
-          });
-        }}
-      >
-        open
-      </Button>
+      <div>
+        <TextField
+          value={room}
+          onChange={e => {
+            setRoom(e.target.value);
+          }}
+        />
+        <Button
+          onClick={() => {
+            const call = peer.joinRoom(room, {
+              mode: "sfu",
+              stream: myDesktopRef.srcObject
+            });
+            if (!call) return;
+            call.on("stream", stream => {
+              (targetDesktopRef as any).srcObject = stream;
+            });
+            const video = peer.joinRoom(room + "video", {
+              mode: "sfu",
+              stream: myVideoRef.srcObject
+            });
+            if (!video) return;
+            video.on("stream", stream => {
+              (targetVideoRef as any).srcObject = stream;
+            });
+          }}
+        >
+          open
+        </Button>
+      </div>
+
       <div>
         <video
           ref={video => ((myVideoRef as any) = video)}
@@ -52,7 +69,17 @@ const App: FunctionComponent = () => {
           style={{ width: "50%", height: "100%" }}
         />
         <video
-          ref={video => ((videoRef as any) = video)}
+          ref={video => ((myDesktopRef as any) = video)}
+          autoPlay={true}
+          style={{ width: "50%", height: "100%" }}
+        />
+        <video
+          ref={video => ((targetVideoRef as any) = video)}
+          autoPlay={true}
+          style={{ width: "50%", height: "100%" }}
+        />
+        <video
+          ref={video => ((targetDesktopRef as any) = video)}
           autoPlay={true}
           style={{ width: "50%", height: "100%" }}
         />
